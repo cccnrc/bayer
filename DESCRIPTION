@@ -1,0 +1,18 @@
+Package: bayer
+Title: Easy implement Bayesian statistical analysis in R
+Version: 0.0.0.9000
+Authors@R:
+    person("Enrico", "Cocchi", , "cocchi.e89@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-7532-956X"))
+Description: bayer allows easy implementation of Bayesian statistics in R for your data analysis.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Imports:
+    brms (>= 2.21.0),
+    splines2 (>= 0.5.1),
+    ggplot2 (>= 3.5.0),
+    ggpubr (>= 0.6.0)
+Remotes:
+    cccnrc/riptw
