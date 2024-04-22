@@ -51,6 +51,25 @@ This will generate an object(`posterior` in the example above) which contains:
 ![extract_posterior() combined plot](plot/posterior_combined.png)
 These plots are needed in order to visualize model quality and the exact effects of a variable of interest in a Bayesian model. For more information take a look at [interpreting the posterior](https://stephens999.github.io/fiveMinuteStats/summarize_interpret_posterior.html) and [Monitoring Convergence](https://m-clark.github.io/bayesian-basics/diagnostics.html)
 
+## Specify Bayesian Priors
+You can easily include Bayesian [priors](https://en.wikipedia.org/wiki/Prior_probability) in the analysis and see how the model changes:
+```R
+### specify prior for a covariate of interest
+priors <- brms::set_prior( 'normal( -0.15, 0.27 )', coef = 'mpg' )
+
+### include priors in the model
+model_logistic_prior <- bayer_logistic(
+                          data = mtcars,
+                          outcome = 'am',
+                          covariates = c( 'mpg', 'cyl', 'vs', 'carb' ),
+                          prior = priors
+                        )
+
+### plot results
+posterior_prior <- extract_posterior( model_logistic_prior, var = 'mpg' )
+```
+![prior risk plot](plot/posterior_prior.combined.png)
+
 ## Calculate Bayes Factor, WAIC and LOO
 `bayer` allows for calculation of Bayes Factor, Watanabe-Akaike Information Criterion (WAIC), and Leave-One-Out Cross-Validation (LOO) to elucidate actual effect of a specific variable:
 ```R
