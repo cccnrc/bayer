@@ -8,6 +8,7 @@
 #'
 #' @param model: a brms::brm() fitted model
 #' @param var: the column name of the variable of interest. It must be a variable passed in the model
+#' @param multinomial_level: the level of interest in the outcome variable if a multinomial model was fitted (optional)
 #' @param palette_risk: the color palette to use for the posterior log-risk distribution plot (defaults to "OrRd")
 #' @param palette_trace: the color palette to use for the posterior trace plot (defaults to "PuOr")
 #' @param font_size: the font size to use for the risk and trace plot (defaults to 16)
@@ -16,11 +17,13 @@
 extract_posterior <- function(
   model,
   var,
+  multinomial_level = NULL,
   palette_risk = 'OrRd',
   font_family = "sans-serif",
   font_size = 16,
   palette_trace = 'PuOr' )
 {
+  multinomial_reference <- multinomial_level
   PALETTE <- palette_risk
   PALETTE2 <- palette_trace
   ### this returns the posterior as a data.frame object, I have a column for each variable passed
@@ -40,7 +43,22 @@ extract_posterior <- function(
     }
   }
   var_factor <- base::gsub( var, "", VV0[ var_index ] )
-  prior_prefix <- base::paste( model$prior$class[ var_index ], '_', sep = '' )
+  ### if family is multinomial some differences apply
+  if ( model$family$family == 'multinomial' ) {
+    ### if user did not specify a level interested in use the first you get
+    if ( base::is.null(multinomial_reference) ) {
+      prior_prefix <- base::paste( model$prior$class[ var_index ], '_', model$prior$dpar[ var_index ], '_', sep = '' )
+      base::warning( '\n no level specified for a multinomial model. Using: "', base::gsub( "mu", "", model$prior$dpar[ var_index ] ), '" to plot posterior results \n  - tip: use "multinomial_level" option to plot result for a specific factor \n' )
+    } else {
+      if ( multinomial_reference %in% base::unique(base::gsub( "mu", "", model$prior$dpar )) ) {
+        prior_prefix <- base::paste( model$prior$class[ var_index ], '_mu', multinomial_reference, '_', sep = '' )
+      } else {
+        base::stop( '\n multinomial_level specified: "', multinomial_reference, '" not found in model \n  - tip: either you typed it wrong or it was used as reference level \n' )
+      }
+    }
+  } else {
+    prior_prefix <- base::paste( model$prior$class[ var_index ], '_', sep = '' )
+  }
   ### if var actually had a factor appended
   if ( base::nchar(var_factor) > 0 ) {
     COL_NAME <- base::paste( prior_prefix, var, var_factor, sep = '' )

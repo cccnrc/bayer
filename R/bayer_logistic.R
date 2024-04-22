@@ -1,18 +1,17 @@
-#' Cox Proportional Hazard Model Bayesian analysis
+#' Logistic Regression Model Bayesian analysis
 #'
-#' This function compile a COXPH model and returns a model with posterior probabilities
-#' based on the event, time and covariates specified in the input data.frame. The model
-#' is compiled as brms::brm() model of brms::cox() family with several parameters that
+#' This function compile a Logistic model and returns a model with posterior probabilities
+#' based on the outcome specified in the input data.frame. The model that is fitted will be
+#' compiled as a brms::brm() model of brms::bernoulli() family with several parameters that
 #' can be adapted based on user preferences. Priors can be specified with "priors" option
 #' and weighted regression can be performed thorugh "weights" option. To fasten up the
 #' analysis "cmdstanr" package can be used, but it needs to be installed and configured.
 #'
 #'
 #' @param data: the data.frame input object
-#' @param time_var: the column name with time for survival analysis. If "time_var2" if specified, this is the start-time of the interval
-#' @param time_var2: the column name of the end-time of the interval (optional)
-#' @param event_var: the column name of the event variable (please note: it must be complete, no NA allowed)
-#' @param covariates: vector of model covariate column names
+#' @param outcome: the column name of the outcome variable (please note: it must be complete, no NA allowed)
+#' @param reference: the reference level to use for the outcome variable (converted to 1) (optional)
+#' @param covariates: vector of model covariate column names (optional)
 #' @param cores: the number of processor cores to parallelize analysis. It requires cmdstanr installed and configured. brm recommends setting the ‘mc.cores’ option to be as many processors as the hardware and RAM allow (optional)
 #' @param priors: the vector with prior probability distribution for the Bayesian analysis (optional). These are "brmsprior" objects created by "brms::set_prior()" or related functions and combined using the "c()" method or the "+" operator. See also "brms::default_prior" for more help. brm() prior option
 #' @param weights: the column name of the weights (e.g. IPTW) to apply to the analysis (optional)
@@ -28,11 +27,10 @@
 #' @param print: print intermediate passages resume to stdout (defaults to FALSE)
 #' @return A brms::brm model with Bayesian posterior draws
 #' @export
-bayer_coxph <- function(
+bayer_logistic <- function(
                   data,
-                  time_var,
-                  time_var2 = NULL,
-                  event_var,
+                  outcome,
+                  reference = NULL,
                   covariates = NULL,
                   cores = NULL,
                   priors = NULL,
@@ -49,33 +47,30 @@ bayer_coxph <- function(
                   print = FALSE )
 {
   ### check event_var exists in data.frame
-  if ( ! event_var %in% base::colnames(data) ) {
-    base::stop( base::paste( event_var, 'not found in dataframe') )
+  if ( ! outcome %in% base::colnames(data) ) {
+    base::stop( '\n ', outcome, 'not found in dataframe \n', sep = ' ' )
   }
   ### must remove all NAs from event_var
-  data2 <- data[ !base::is.na(data[[ event_var ]]), ]
+  data2 <- data[ !base::is.na(data[[ outcome ]]), ]
   data2_num <- base::nrow( data2 )
   data_num <- base::nrow( data )
   if ( base::isTRUE(stdout) ) {
     base::cat('  --> ', data_num - data2_num, ' samples removed due to missing in event variable' )
   }
-  ### convert to brms event type
-  if ( base::is.numeric( data[[ event_var ]]) ) {
-    data2[[ event_var ]] <- factor(data2[[ event_var ]])
-  }
-  data2[[ event_var ]] <- brms_event_var( data = data2, event_var = event_var )
+  ### convert outcome
+  data2[[ outcome ]] <- brms_outcome_var( data2[[ outcome ]], positive = reference, family = 'binomial' )
+  # base::print( data2[[outcome]] )
   ### if covariates not passed use 1
   if ( base::is.null( covariates ) ) {
     covariates <- '1'
   }
   FF1 <- riptw::get_formula(
-                  outcome = event_var,
-                  time_var = time_var,
-                  time_var2 = time_var2,
+                  outcome = outcome,
                   covariates = covariates,
                   weights = weights,
                   bayesian = TRUE
                 )
+  # base::print( FF1 )
   ### check cmdstanr package is installed and properly configured
   check_cmdstanr_out <- check_cmdstanr_error()
   if ( "cmdstanr" %in% base::rownames( utils::installed.packages()) ) {
@@ -96,7 +91,7 @@ bayer_coxph <- function(
       OUT <- utils::capture.output(model <- brms::brm(formula = FF1,
                                                       prior = priors,
                                                       data = data2,
-                                                      family = brms::cox(),
+                                                      family = brms::brmsfamily( 'bernoulli', 'logit'),
                                                       chains = brm_chains,
                                                       cores = cores,
                                                       backend = "cmdstanr",
@@ -127,7 +122,7 @@ bayer_coxph <- function(
       OUT <- utils::capture.output(model <- brms::brm(formula = FF1,
                                                     prior = priors,
                                                     data = data2,
-                                                    family = brms::cox(),
+                                                    family = brms::brmsfamily( 'bernoulli', 'logit'),
                                                     chains = brm_chains,
                                                     cores = cores,
                                                     iter = brm_iter,
@@ -152,7 +147,7 @@ bayer_coxph <- function(
     OUT <- utils::capture.output(model <- brms::brm(formula = FF1,
                                                     prior = priors,
                                                     data = data2,
-                                                    family = brms::cox(),
+                                                    family = brms::brmsfamily( 'bernoulli', 'logit'),
                                                     chains = brm_chains,
                                                     cores = cores,
                                                     iter = brm_iter,

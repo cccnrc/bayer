@@ -7,6 +7,7 @@
 extract_posterior(
   model,
   var,
+  multinomial_level = NULL,
   palette_risk = "OrRd",
   font_family = "sans-serif",
   font_size = 16,
@@ -17,6 +18,8 @@ extract_posterior(
 \item{model:}{a brms::brm() fitted model}
 
 \item{var:}{the column name of the variable of interest. It must be a variable passed in the model}
+
+\item{multinomial_level:}{the level of interest in the outcome variable if a multinomial model was fitted (optional)}
 
 \item{palette_risk:}{the color palette to use for the posterior log-risk distribution plot (defaults to "OrRd")}
 

@@ -13,6 +13,9 @@ Imports:
     brms (>= 2.21.0),
     splines2 (>= 0.5.1),
     ggplot2 (>= 3.5.0),
-    ggpubr (>= 0.6.0)
+    ggpubr (>= 0.6.0),
+    mice (>= 3.16.0),
+    furrr (>= 0.3.1),
+    naniar (>= 1.0.0)
 Remotes:
     cccnrc/riptw
