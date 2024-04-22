@@ -23,7 +23,7 @@ missing_imputation(
 
 \item{table:}{the full path of the file to write down the iumputed table (optional)}
 
-\item{table_sep:}{the field separator to use for the file to write down the iumputed table (defaults to '\t')}
+\item{table_sep:}{the field separator to use for the file to write down the iumputed table (defaults to tab-separated file)}
 
 \item{cores:}{the number of processor cores to parallelize analysis. If null the function will use all available cores (optional)}
 

@@ -8,7 +8,7 @@
 #' @param data: the input data.frame to perform analysis on
 #' @param id: column name of the ID column. This is important to indicate to the function as imputing on ID column will significantly slow down the imputation. (optional)
 #' @param table: the full path of the file to write down the iumputed table (optional)
-#' @param table_sep: the field separator to use for the file to write down the iumputed table (defaults to '\t')
+#' @param table_sep: the field separator to use for the file to write down the iumputed table (defaults to tab-separated file)
 #' @param cores: the number of processor cores to parallelize analysis. If null the function will use all available cores (optional)
 #' @param imp_num: The number of desired imputated datasets, "m" mice::futuremice() option (defaults to 5)
 #' @param seed: A scalar to be used as the seed value for the mice algorithm, "seed" mice::futuremice() option (optional)
