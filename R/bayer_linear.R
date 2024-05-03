@@ -11,7 +11,12 @@
 #' @param data: the data.frame input object
 #' @param outcome: the column name of the outcome variable (please note: it must be complete, no NA allowed)
 #' @param robust: if set to FALSE a simple Gaussian family regression will be operated, otherwise a Student family will be used, more robust against ouliers (default)
-#' @param covariates: vector of model covariate column names (optional)
+#' @param covariates: vector of model covariate column names and additional terms, such as "Intercept", "0", etc. (optional)
+#' @param random_covariates: vector of model covariate to use as random effect terms (optional)
+#' @param sigma_link: link function to be used for sigma analysis (defaults to "log")
+#' @param nu_link: link function to be used for nu analysis (defaults to "logm1")
+#' @param sigma_covariates: vector of model covariates to use for sigma specification (optional)
+#' @param sigma_rnadom_covariates: vector of model covariates to use as random effects for sigma specification (optional)
 #' @param cores: the number of processor cores to parallelize analysis. It requires cmdstanr installed and configured. brm recommends setting the ‘mc.cores’ option to be as many processors as the hardware and RAM allow (optional)
 #' @param priors: the vector with prior probability distribution for the Bayesian analysis (optional). These are "brmsprior" objects created by "brms::set_prior()" or related functions and combined using the "c()" method or the "+" operator. See also "brms::default_prior" for more help. brm() prior option
 #' @param weights: the column name of the weights (e.g. IPTW) to apply to the analysis (optional)
@@ -32,6 +37,11 @@ bayer_linear <- function(
                   outcome,
                   robust = TRUE,
                   covariates = NULL,
+                  random_covariates = NULL,
+                  sigma_covariates = NULL,
+                  sigma_random_covariates = NULL,
+                  sigma_link = "log",
+                  nu_link = "logm1",
                   cores = NULL,
                   priors = NULL,
                   weights = NULL,
@@ -63,14 +73,37 @@ bayer_linear <- function(
   ### if covariates not passed use 1
   if ( base::is.null( covariates ) ) {
     covariates <- '1'
+  } else {
+    if ( "Intercept" %in% covariates ) {
+      if ( ( ! 0 %in% covariates ) & ( ! 1 %in% covariates ) ) {
+        covariates <- c( 0, covariates )
+      }
+    }
   }
+  ### create the formula thorugh riptw
   FF1 <- riptw::get_formula(
                   outcome = outcome,
                   covariates = covariates,
+                  random_covariates = random_covariates,
                   weights = weights,
                   bayesian = TRUE
                 )
   # base::print( FF1 )
+  ### if user asked to estimate sigma as well
+  if ( ! base::is.null( sigma_covariates ) ) {
+    if ( ( ! 0 %in% covariates ) & ( ! 1 %in% covariates ) ) {
+      covariates <- c( 0, covariates )
+    }
+    FF_sigma <- riptw::get_formula(
+                    outcome = "sigma",
+                    covariates = sigma_covariates,
+                    random_covariates = sigma_random_covariates,
+                    weights = weights,
+                    bayesian = TRUE,
+                    string = TRUE
+                  )
+    FF1 <- brms::brmsformula( FF1, FF_sigma )
+  }
   ### if user asked for robust family is 'student', else is 'gaussian'
   if ( base::isTRUE( robust ) ) {
     brms_family <- 'student'
@@ -97,7 +130,7 @@ bayer_linear <- function(
       OUT <- utils::capture.output(model <- brms::brm(formula = FF1,
                                                       prior = priors,
                                                       data = data2,
-                                                      family = brms::brmsfamily( brms_family, 'identity'),
+                                                      family = brms::brmsfamily( brms_family, link_sigma = sigma_link, link_nu = nu_link ),
                                                       chains = brm_chains,
                                                       cores = cores,
                                                       backend = "cmdstanr",

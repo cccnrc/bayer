@@ -21,7 +21,7 @@
 #' @param font_family: the font family to use for the risk and trace plot (defaults to "sans-serif")
 #' @return A list() object composed of "$data": the data.frame object with posterior draws; "risk_plot": the posterior log-risk distribution plot for the variable of interest as a ggplot2() object; "trace_plot": the posterior trace plot for the variable of interest as a ggplot2() object; "combined_plot": the "risk_plot" and "trace_plot" combined as ggplot2() object
 #' @export
-extract_posterior <- function(
+extract_posterior2 <- function(
   model,
   var,
   var_level = NULL,

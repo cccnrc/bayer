@@ -9,6 +9,11 @@ bayer_linear(
   outcome,
   robust = TRUE,
   covariates = NULL,
+  random_covariates = NULL,
+  sigma_covariates = NULL,
+  sigma_random_covariates = NULL,
+  sigma_link = "log",
+  nu_link = "logm1",
   cores = NULL,
   priors = NULL,
   weights = NULL,
@@ -31,7 +36,17 @@ bayer_linear(
 
 \item{robust:}{if set to FALSE a simple Gaussian family regression will be operated, otherwise a Student family will be used, more robust against ouliers (default)}
 
-\item{covariates:}{vector of model covariate column names (optional)}
+\item{covariates:}{vector of model covariate column names and additional terms, such as "Intercept", "0", etc. (optional)}
+
+\item{random_covariates:}{vector of model covariate to use as random effect terms (optional)}
+
+\item{sigma_link:}{link function to be used for sigma analysis (defaults to "log")}
+
+\item{nu_link:}{link function to be used for nu analysis (defaults to "logm1")}
+
+\item{sigma_covariates:}{vector of model covariates to use for sigma specification (optional)}
+
+\item{sigma_rnadom_covariates:}{vector of model covariates to use as random effects for sigma specification (optional)}
 
 \item{cores:}{the number of processor cores to parallelize analysis. It requires cmdstanr installed and configured. brm recommends setting the ‘mc.cores’ option to be as many processors as the hardware and RAM allow (optional)}
 

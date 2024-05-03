@@ -43,8 +43,9 @@ model_logistic <- bayer_logistic(
 ```R
 posterior <- extract_posterior( model_logistic, var = 'mpg' )
 ```
-This will generate an object(`posterior` in the example above) which contains:
+This will generate an object(`posterior` in the example above) for each variable factor identified in the model (`b_mpg` only in the example above) which contains:
 - **data**: posterior draws of the specified model
+- **stats**: summary statistics of the posterior draws (mean, sd, se, median, q1, q3, min, max, [MAP](https://en.wikipedia.org/wiki/Maximum_a_posteriori_estimation), [ETI](https://en.wikipedia.org/wiki/Credible_interval), [HDI](https://en.wikipedia.org/wiki/Credible_interval), [ROPE](https://easystats.github.io/bayestestR/articles/region_of_practical_equivalence.html))
 - **risk_plot**: posterior log-risk distribution plot of the specified variable
 - **trace_plot**: posterior trace distribution plot of the specified variable
 - **combined_plot**: combined `risk_plot` and `trace_plot`:
@@ -114,6 +115,31 @@ loo_iptw <- loo_analysis( model_logistic_iptw, var = 'vs'  )
 - **logistic** regression: with `bayer_logistic()`
 - **logistic** regression: with `bayer_multinomial()`
 - **Cox Proportonal Hazard Model** regression: with `bayer_coxph()`
+
+## Parallelize bayer
+In order to significantly speed up analysis, `bayer` needs you to have [cmdstanr](https://mc-stan.org/cmdstanr/articles/cmdstanr.html) installed and configured. This is generally quite simple as:
+```
+remotes::install_github("stan-dev/cmdstanr")
+library(cmdstanr)
+```
+check toolchain is properly set:
+```
+check_cmdstan_toolchain()
+```
+install_cmdstan:
+```
+install_cmdstan( cores = <your-CPU-number-here> )
+```
+check everything worked properly:
+```
+file <- file.path(cmdstan_path(), "examples", "bernoulli", "bernoulli.stan")
+mod <- cmdstan_model(file)
+```
+if everything worked fine you should see:
+```
+Model executable is up to date!
+```
+Every time you run `bayer` it will automatically check for `cmdstanr` and, in case it is installed and properly configured, it will use it with specified cores, speeding up a lot the sampling part of the analysis!
 
 # Customize bayer
 `bayer` allows for a lot of more detailed analysis. Take a look at:
