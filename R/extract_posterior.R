@@ -116,8 +116,10 @@ extract_posterior <- function(
     ### extract summary statistics for posteriors
     var_posterior_stat_df <- extract_posterior_stats( post = var_fit )
     rownames(var_posterior_stat_df) <- COL_NAME
+    PLOT_DB[[COL_NAME]] <- var_fit
+    # PLOT_DB[[COL_NAME]] <- var_fit
     # how many are >0 (log risk ratio)
-    LRR <- base::round( base::length( base::which(M00df[[COL_NAME]] > 0) ) / base::length(M00df[[COL_NAME]]) * 100, 2 )
+    LRR <- base::round( base::length( base::which(PLOT_DB[[COL_NAME]] > 0) ) / base::length(PLOT_DB[[COL_NAME]]) * 100, 2 )
     ### if user wants to plot the reference factor of a categorical binomial variable
     if ( base::isTRUE(inverse) ) {
       P0 <- ggplot2::ggplot(PLOT_DB, ggplot2::aes(x = -base::get(COL_NAME), group = .chain, colour = .chain + 5)) +
