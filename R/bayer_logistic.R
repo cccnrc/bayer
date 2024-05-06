@@ -23,7 +23,7 @@
 #' @param brm_warmup: a positive integer specifying number of warmup (aka burnin) iterations. This also specifies the number of iterations used for stepsize adaptation, so warmup draws should not be used for inference. The number of warmup should not be larger than "brm_iter" and the default is "brm_iter / 2": brm() warmup option
 #' @param brm_seed: the seed for random number generation to make results reproducible. If NA (the default), "Stan" will set the seed randomly: brm() seed option
 #' @param brm_adapt_delta: brm() control factor to regulate the number of divergent transitions that cause a bias in the obtained posterior draws. This should be generally 0.8 to 0.999: brm() control option (default to 0.999). See stan for more details
-#' @param brm_max_treedepth: brm() control factor to regulate the number of divergent transitions that cause a bias in the obtained posterior draws. This should be generally >10: brm() control option (default to 15). See stan for more details
+#' @param brm_max_treedepth: brm() control factor to regulate the number of divergent transitions that cause a bias in the obtained posterior draws. This should be generally >=10: brm() control option (defaults to 10). See stan for more details
 #' @param print: print intermediate passages resume to stdout (defaults to FALSE)
 #' @return A brms::brm model with Bayesian posterior draws
 #' @export
@@ -43,7 +43,7 @@ bayer_logistic <- function(
                   brm_warmup = base::floor( brm_iter / 2 ),
                   brm_seed = NA,
                   brm_adapt_delta = 0.999,
-                  brm_max_treedepth = 15,
+                  brm_max_treedepth = 10,
                   print = FALSE )
 {
   ### check event_var exists in data.frame
