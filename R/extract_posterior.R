@@ -82,33 +82,26 @@ extract_posterior <- function(
   } else {
     prior_prefix <- base::paste( var_class[ var_level_index ], '_', sep = '' )
   }
+
   ### if var has multiple factors create plots and data for each one
   names_vector <- base::vector()
   plot_list <- base::list()
   for ( i in 1:length(var_levels) ) {
-    prior_prefix <- var_class[i]
-    var_prior_dpar <- var_dpar[i]
-    var_factor <- var_levels[i]
-    if ( base::nchar(var_factor) > 0 ) {
-      if ( base::nchar(var_prior_dpar) > 0 ) {
-        COL_NAME <- base::paste( prior_prefix, '_', var_prior_dpar, '_', var, var_factor, sep = '' )
-      } else {
-        COL_NAME <- base::paste( prior_prefix, '_', var, var_factor, sep = '' )
-      }
-    } else {
-      if ( base::nchar(var_prior_dpar) > 0 ) {
-        COL_NAME <- base::paste( prior_prefix, '_', var_prior_dpar, '_', var, sep = '' )
-      } else {
-        COL_NAME <- base::paste( prior_prefix, '_', var, sep = '' )
-      }
-    }
+    COL_NAME <- compose_fit_name(
+                    var_name = var,
+                    model_fit_names = base::names(model$fit),
+                    var_factor = var_levels[i],
+                    var_prior_prefix = var_class[i],
+                    var_prior_dpar = var_dpar[i],
+                    var_group = var_group[i]
+                  )
     names_vector <- c( names_vector, COL_NAME )
     ### extract variable posterior from the model
     fit_df <- base::as.data.frame(model$fit)
     var_fit <- fit_df[[COL_NAME]]
     ### based on link function used (for main family and sigma too) need to change returned value: if "identity" values are returned as such()
     link_main <- model$family$link
-    if ( (link_main == "log") | ( link_main == "logit" ) | ( var_prior_dpar == "sigma" ) ) {
+    if ( (link_main == "log") | ( link_main == "logit" ) | ( var_dpar[i] == "sigma" ) ) {
       if ( base::isFALSE(transformed) ) {
         var_fit <- base::exp( var_fit )
       }

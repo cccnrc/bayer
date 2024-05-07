@@ -1,4 +1,5 @@
 #' Linear Regression Model Bayesian analysis
+#' @param random_slope: the variable to be used as random slope (optional)
 #'
 #' This function compile a Linear model and returns a model with posterior probabilities
 #' based on the outcome specified in the input data.frame. The model that is fitted will be
@@ -13,6 +14,7 @@
 #' @param robust: if set to FALSE a simple Gaussian family regression will be operated, otherwise a Student family will be used, more robust against ouliers (default)
 #' @param covariates: vector of model covariate column names and additional terms, such as "Intercept", "0", etc. (optional)
 #' @param random_covariates: vector of model covariate to use as random effect terms (optional)
+#' @param random_slope: the variable to be used as random slope (optional)
 #' @param sigma_link: link function to be used for sigma analysis (defaults to "log")
 #' @param nu_link: link function to be used for nu analysis (defaults to "logm1")
 #' @param sigma_covariates: vector of model covariates to use for sigma specification (optional)
@@ -38,6 +40,7 @@ bayer_linear <- function(
                   robust = TRUE,
                   covariates = NULL,
                   random_covariates = NULL,
+                  random_slope = NULL,
                   sigma_covariates = NULL,
                   sigma_random_covariates = NULL,
                   sigma_link = "log",
@@ -85,6 +88,7 @@ bayer_linear <- function(
                   outcome = outcome,
                   covariates = covariates,
                   random_covariates = random_covariates,
+                  random_slope = random_slope,
                   weights = weights,
                   bayesian = TRUE
                 )

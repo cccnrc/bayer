@@ -13,6 +13,8 @@
 #' @param time_var2: the column name of the end-time of the interval (optional)
 #' @param event_var: the column name of the event variable (please note: it must be complete, no NA allowed)
 #' @param covariates: vector of model covariate column names
+#' @param random_covariates: vector of model covariate to use as random effect terms (optional)
+#' @param random_slope: the variable to be used as random slope (optional)
 #' @param cores: the number of processor cores to parallelize analysis. It requires cmdstanr installed and configured. brm recommends setting the ‘mc.cores’ option to be as many processors as the hardware and RAM allow (optional)
 #' @param priors: the vector with prior probability distribution for the Bayesian analysis (optional). These are "brmsprior" objects created by "brms::set_prior()" or related functions and combined using the "c()" method or the "+" operator. See also "brms::default_prior" for more help. brm() prior option
 #' @param weights: the column name of the weights (e.g. IPTW) to apply to the analysis (optional)
@@ -34,6 +36,8 @@ bayer_coxph <- function(
                   time_var2 = NULL,
                   event_var,
                   covariates = NULL,
+                  random_covariates = NULL,
+                  random_slope = NULL,
                   cores = NULL,
                   priors = NULL,
                   weights = NULL,
@@ -73,6 +77,8 @@ bayer_coxph <- function(
                   time_var = time_var,
                   time_var2 = time_var2,
                   covariates = covariates,
+                  random_covariates = random_covariates,
+                  random_slope = random_slope,
                   weights = weights,
                   bayesian = TRUE
                 )
